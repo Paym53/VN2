@@ -29,6 +29,12 @@ python vn2_simulate.py "<folder>"     # score six order files
   the weeks 1 to 8 scored by the competition are the final test, not a training set.
 - **Report the score honestly**, with the benchmark (4,334.0) and the winner (3,763.2)
   beside it.
+- **Hard rules H1-H11** in `docs/project_plan.md` §3 (official files frozen, no look-ahead,
+  test-set lock, provenance, solver checked against an exact oracle, honest reporting) are
+  hard constraints. Each one is enforced by a test; never weaken or skip such a test.
+- **Tools:** forecasts come from t0-gamma (`docs/t0_gamma_guide.md`), orders from the Seeker
+  solver. Both run on the user's machine; Claude writes the scripts and reads the outputs.
+- Never commit the Seeker licence (`*.sio`) or the Seeker manuals (licensed material).
 - `Orders - */` folders are run output and stay out of git.
 
 ## Workflow
