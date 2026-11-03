@@ -96,3 +96,28 @@ def test_forecast_cutoff_feeds_only_known_weeks(demand, use_week_of_year):
     if use_week_of_year:
         covariates = model.settings["future_covariates"]
         assert covariates.shape == (len(model.context), 2, weeks_known + t0f.HORIZON)
+
+
+def test_the_input_is_found_in_the_repository_by_default():
+    assert t0f.find_input() == t0f.DEMAND_CSV.resolve()
+
+
+def test_the_input_is_found_when_run_from_another_folder(tmp_path, monkeypatch):
+    copy = tmp_path / t0f.INPUT_NAME
+    copy.write_bytes(t0f.DEMAND_CSV.read_bytes())
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(t0f, "HERE", tmp_path / "elsewhere")
+    monkeypatch.setattr(t0f, "DEMAND_CSV", tmp_path / "missing" / t0f.INPUT_NAME)
+    assert t0f.find_input() == copy.resolve()
+
+
+def test_an_explicit_path_works_with_or_without_the_extension(tmp_path):
+    copy = tmp_path / t0f.INPUT_NAME
+    copy.write_bytes(t0f.DEMAND_CSV.read_bytes())
+    assert t0f.find_input(str(copy)) == copy.resolve()
+    assert t0f.find_input(str(copy.with_suffix(""))) == copy.resolve()
+
+
+def test_a_missing_input_explains_where_it_looked(tmp_path):
+    with pytest.raises(SystemExit, match="Pass the path with --input"):
+        t0f.find_input(str(tmp_path / "nothing.csv"))
