@@ -1,0 +1,25 @@
+[project]
+name = "vn2"
+version = "0.1.0"
+description = "VN2 inventory competition: t0-gamma forecasts and Seeker ordering"
+requires-python = ">=3.11"
+dependencies = ["numpy==2.5.3", "pandas==3.0.5"]
+
+[tool.ruff]
+line-length = 100
+# The official competition files stay exactly as published (hard rule H1).
+extend-exclude = ["vn2_simulate.py", "vn2_play.py", "vn2_benchmark.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C90", "PLR0915"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-statements = 40
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q --cov=vn2 --cov-report=term-missing --cov-fail-under=85"

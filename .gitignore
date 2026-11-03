@@ -4,3 +4,5 @@ __pycache__/
 Orders - */
 *.sio
 results/tmp/
+.coverage
+.pytest_cache/

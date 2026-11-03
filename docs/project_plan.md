@@ -55,6 +55,10 @@ per-product manual adjustments; segmentation (ABC, XYZ, demand patterns); outlie
 | H10 | Honest reporting. | Every score report prints the benchmark (4,334.0) and the winner (3,763.2) beside it, plus the backtest mean and spread. |
 | H11 | No secrets in the public repo. | `.gitignore` covers `*.sio` (Seeker licence); a test fails if any `*.sio` file is tracked. |
 
+Status: H1, H2, H3, H4, H6, H10 and H11 are enforced since phase 0. H8 arrives with the
+simulator (phase 2), H5 with the forecast files (phase 3), H7 and H9 with the Seeker model
+(phase 4). The gate settings are themselves tested (`tests/test_gates_stay_strict.py`).
+
 Quality gates (Tier 2): `ruff` with max complexity 10 and max 40 statements per function,
 `pytest --cov-fail-under=85` on the `vn2/` package, mutation testing (`mutmut`) on the
 simulator and cost functions. Seeker and t0-gamma cannot run in CI (licence, model
