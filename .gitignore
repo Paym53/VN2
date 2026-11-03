@@ -6,3 +6,4 @@ Orders - */
 results/tmp/
 .coverage
 .pytest_cache/
+forecasts/

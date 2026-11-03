@@ -1,6 +1,7 @@
 """Architecture rules, checked by reading the source code (hard rules H3, H4 and H11).
 
-- Only vn2/data.py reads the competition files; everything else goes through `as_of`.
+- Only vn2/data.py reads the competition files; everything else goes through `as_of`
+  (the t0 script reads only the cleaned CSV, which holds weeks up to week 0).
 - Only scripts/final_score.py may load the demand of weeks 1 to 8 (vn2_simulate.load) or use
   vn2_play; nothing in the project may name a test week or a test file.
 - No Seeker licence file is ever tracked by git.
@@ -14,10 +15,13 @@ import pytest
 
 from vn2 import config
 
-PROJECT_FILES = sorted((config.REPO / "vn2").rglob("*.py")) + sorted(
-    (config.REPO / "scripts").rglob("*.py"))
+PROJECT_FILES = sorted(
+    path for folder in ("vn2", "scripts", "forecasting")
+    for path in (config.REPO / folder).rglob("*.py"))
 FINAL_SCORE = config.REPO / "scripts" / "final_score.py"
-DATA_READER = config.REPO / "vn2" / "data.py"
+# vn2/data.py reads the competition files; the t0 script reads only the cleaned CSV, whose
+# content is pinned by tests/test_t0_forecast_inputs.py (history up to week 0).
+DATA_READERS = {config.REPO / "vn2" / "data.py", config.REPO / "forecasting" / "t0_forecast.py"}
 FILE_READERS = {"read_csv", "read_table", "read_parquet", "read_excel"}
 
 
@@ -55,7 +59,7 @@ def test_only_the_final_score_touches_the_test_demand(path):
 
 @pytest.mark.parametrize("path", PROJECT_FILES, ids=relative)
 def test_only_the_data_module_reads_files(path):
-    if path == DATA_READER:
+    if path in DATA_READERS:
         return
     readers = FILE_READERS & names_used(path)
     assert not readers, f"Read data through vn2.data.as_of, not {readers}."

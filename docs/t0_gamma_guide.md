@@ -92,3 +92,20 @@ matches the round.
 The maximum context length, the GPU requirement, a mean forecast, and any guidance on
 intermittent or weekly data. Fine-tuning is possible in principle (`forward` is the entry
 point) but there is no recipe; we stay zero-shot.
+
+## Verified against tfc-t0 0.6.0 (source code, and a run with random weights)
+
+- `predict` accepts NumPy arrays and moves them to the model's device; `model.to("cuda")` (or
+  `"mps"`) is the only device setting. `out.quantiles` is a float32 torch tensor on that device:
+  use `.cpu().numpy()`. No `.detach()` needed (predict runs in inference mode).
+- The four adjustment flags (`trim_leading_missing`, `symmetric_averaging`, `clip_nonnegative`,
+  `snap_integers`) are **off by default**: pass them explicitly.
+- Trained levels: 0.01, 0.05, 0.10, ..., 0.95, 0.99 (21). Requested levels must be ascending.
+- A cell can be marked in a `mask` as VALID, PAD, MISSING, CENSORED or WITHHELD; NaN means MISSING.
+  VN2 stock-out weeks always have 0 sales, so "censored at 0" carries no more information than
+  "missing": NaN is the right encoding.
+- No batch-size argument and no documented maximum context; 599 series x 157 weeks run in one call.
+- Speed on a cloud CPU: 6-13 s per cutoff, about 43 s with the week-of-year covariates.
+
+The ready-to-run script for VN2 is `forecasting/t0_forecast.py`; its input is
+`data_clean/demand_clean_2024-04-08.csv` (from `scripts/export_cleaned_demand.py`).
