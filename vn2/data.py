@@ -51,6 +51,15 @@ def as_of(cutoff, data_dir=config.DATA_DIR):
     return History(cutoff, sales[known_weeks], in_stock[known_weeks].astype(bool), master)
 
 
+def cut(history, cutoff):
+    """The same history, ending at an earlier cutoff (for backtests over many cutoffs)."""
+    cutoff = pd.Timestamp(cutoff)
+    weeks = [column for column in history.sales.columns if pd.Timestamp(column) <= cutoff]
+    if not weeks or weeks[-1] != cutoff.strftime("%Y-%m-%d"):
+        raise ValueError(f"{cutoff.date()} is not a week of this history.")
+    return History(cutoff, history.sales[weeks], history.in_stock[weeks], history.master)
+
+
 def round_cutoff(round_number):
     """The last week known before round k (k = 1 to 6): week k-1."""
     if not 1 <= round_number <= config.LAST_ROUND:
